@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartLeaf - AI Plant Health Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="tracker"></div>
+    <div id="particles"></div>
+    
+    <!-- Header -->
+    <header class="site-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="logoo.png" alt="SmartLeaf Logo" class="logo-img">
+                <span class="logo-text">SmartLeaf</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="features.html" class="nav-link">Features</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">Discover Your Plant's Health</h1>
+            <p class="hero-description">Advanced AI technology that identifies plant species and analyzes health conditions instantly. Simply upload a leaf photo and get comprehensive insights.</p>
+        </section>
+
+        <!-- Main Analysis Card -->
+        <div class="main-card">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">🌿</div>
+                <div class="upload-text">Drop your plant image here</div>
+                <div class="upload-hint">or click to browse</div>
+                <div class="supported-formats">JPG, PNG, WEBP • Max 10MB</div>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+
+            <div class="preview-container" id="previewContainer">
+                <div class="image-wrapper">
+                    <img id="imagePreview" class="image-preview" alt="Image Preview">
+                </div>
+                <button class="analyze-btn" id="analyzeBtn">
+                    <span class="btn-icon">🔍</span>
+                    <span>Analyze Now</span>
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="loader-wrapper">
+                    <div class="loader"></div>
+                </div>
+                <div class="loading-text">Analyzing your plant...</div>
+                <div class="loading-subtext">Our AI is examining the image</div>
+            </div>
+
+            <div class="results-container" id="resultsContainer">
+                <div class="results-header">
+                    <h2>Analysis Complete</h2>
+                    <div class="results-badge">✓ Success</div>
+                </div>
+                
+                <div class="results-grid">
+                    <div class="result-card">
+                        <div class="result-icon">🌱</div>
+                        <div class="result-label">Plant Species</div>
+                        <div class="result-value" id="plantName">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-icon">💚</div>
+                        <div class="result-label">Health Status</div>
+                        <div class="result-value" id="healthStatus">-</div>
+                    </div>
+                    <div class="result-card">
+                        <div class="result-icon">📊</div>
+                        <div class="result-label">Confidence</div>
+                        <div class="result-value" id="confidence">-</div>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h3>💡 Care Tips</h3>
+                    <div class="recommendations-list">
+                        <!-- سيتم ملؤها ديناميكياً من JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <button class="reset-btn" id="resetBtn">
+                    <span>↻</span> Analyze Another Plant
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Features -->
+        <section class="quick-features">
+            <div class="feature-badge">
+                <span class="badge-icon">⚡</span>
+                <span>Instant Results</span>
+            </div>
+            <div class="feature-badge">
+                <span class="badge-icon">🎯</span>
+                <span>AI-Powered</span>
+            </div>
+            <div class="feature-badge">
+                <span class="badge-icon">🔒</span>
+                <span>100% Private</span>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3>SmartLeaf</h3>
+                <p>Making plant care accessible through AI technology</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 SmartLeaf. Empowering plant lovers with technology.</p>
+        </div>
+    </footer>
+
+    <!-- TensorFlow.js Library - مهم جداً! -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    
+    <!-- Your Script -->
+    <script src="script.js"></script>
+</body>
+</html>
