@@ -1,0 +1,16 @@
+# Python virtual environment
+.venv/
+__pycache__/
+*.pyc
+
+# Model and conversion outputs
+SmartLeaf/model_tfjs/
+*.keras
+*.h5
+*.bin
+*.pt
+*.pkl
+
+# System and temporary files
+.DS_Store
+Thumbs.db
