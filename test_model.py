@@ -2,9 +2,9 @@
 🧪 اختبار المودل مباشرة - نفس الطريقة اللي درّبت فيها
 """
 
-from tensorflow import keras
-import numpy as np
-from PIL import Image
+from tensorflow import keras # type: ignore
+import numpy as np # type: ignore
+from PIL import Image # type: ignore
 
 # تحميل المودل
 print("⏳ Loading model...")
@@ -17,9 +17,8 @@ print(f"Input shape: {model.input_shape}")
 print(f"Output shape: {model.output_shape}")
 
 # فحص الطبقة الأولى
-first_layer = model.layers[0]
-print(f"\nFirst layer: {first_layer.name}")
-print(f"Expected input: {first_layer.input_shape}")
+print(f"\nFirst layer: {model.layers[0].name}")
+print(f"Model expects: {model.input_shape}")
 
 # اسماء الكلاسات (مختصرة)
 class_names = [
