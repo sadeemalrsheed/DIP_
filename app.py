@@ -1,50 +1,27 @@
 """
-🌿 SmartLeaf - Simple Python API
-No conversion needed! Use your Keras model directly.
+🌿 SmartLeaf - Simple Rescale (1/255)
 """
 
-from flask import Flask, request, jsonify # type: ignore
-from flask_cors import CORS # type: ignore
-from tensorflow import keras # type: ignore
-import numpy as np # type: ignore
-from PIL import Image # type: ignore
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from tensorflow import keras
+import numpy as np
+from PIL import Image
 import io
 import os
 
 app = Flask(__name__)
-CORS(app)  # للسماح بالاتصال من المتصفح
+CORS(app)
 
-# تحميل المودل عند بداية التطبيق
 print("⏳ Loading model...")
-
-# البحث عن ملف المودل
-model_file = None
-possible_names = [
-    'final_model_transfer_learning.keras',
-    'final_model_transfer_learning.h5',
-    'final*.keras',
-    'final*.h5'
-]
-
-for name in possible_names:
-    if '*' in name:
-        import glob
-        files = glob.glob(name)
-        if files:
-            model_file = files[0]
-            break
-    elif os.path.exists(name):
-        model_file = name
-        break
-
-if not model_file:
-    raise FileNotFoundError("❌ Model file not found! Please add: final_model_transfer_learning.keras")
+model_file = 'final_model_transfer_learning.keras'
+if not os.path.exists(model_file):
+    raise FileNotFoundError(f"❌ Model not found: {model_file}")
 
 model = keras.models.load_model(model_file)
 print(f"✅ Model loaded: {model_file}")
 print(f"📊 Classes: {model.output_shape[-1]}")
 
-# قائمة الكلاسات (نفس الترتيب في script.js)
 class_names = [
     "Apple_Apple_scab", "Apple_Black_rot", "Apple_Cedar_apple_rust", "Apple_healthy",
     "Blueberry_healthy", "Cherry_Powdery_mildew", "Cherry_healthy",
@@ -81,70 +58,63 @@ class_names = [
 ]
 
 def preprocess_image(image_file):
-    """معالجة الصورة للمودل"""
+    """Simple rescale: [0,255] -> [0,1]"""
     img = Image.open(io.BytesIO(image_file.read())).convert('RGB')
-    img = img.resize((224, 224))
-    img_array = np.array(img) / 255.0
+    img = img.resize((224, 224), Image.Resampling.LANCZOS)
+    img_array = np.array(img, dtype=np.float32)
+    
+    # Simple division by 255
+    img_array = img_array / 255.0
+    
     img_array = np.expand_dims(img_array, axis=0)
+    print(f"📐 Shape: {img_array.shape}, Range: [{img_array.min():.3f}, {img_array.max():.3f}]")
     return img_array
 
 @app.route('/')
 def home():
-    return """
+    return f"""
     <html>
-    <head>
-        <style>
-            body { font-family: Arial; text-align: center; padding: 50px; background: #f0f7f4; }
-            h1 { color: #457b67; }
-            .status { background: #8BC3AE; color: white; padding: 20px; border-radius: 10px; }
-        </style>
-    </head>
-    <body>
-        <h1>🌿 SmartLeaf API is Running!</h1>
-        <div class="status">
-            <p>✅ Server is Ready</p>
-            <p>📊 Model: {}</p>
-            <p>🔢 Classes: {}</p>
-            <p>📝 Use POST /predict to analyze plant images</p>
-        </div>
-    </body>
-    </html>
-    """.format(model_file, len(class_names))
+    <head><style>body{{font-family:Arial;text-align:center;padding:50px;background:#f0f7f4;}}
+    h1{{color:#457b67;}}.status{{background:#8BC3AE;color:white;padding:20px;border-radius:10px;}}</style></head>
+    <body><h1>🌿 SmartLeaf API (Rescale 1/255)</h1>
+    <div class="status"><p>✅ Server Ready</p><p>📊 Model: {model_file}</p>
+    <p>🔢 Classes: {len(class_names)}</p></div></body></html>
+    """
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """استقبال الصورة والتنبؤ"""
     try:
-        # التحقق من وجود صورة
         if 'image' not in request.files:
-            return jsonify({'error': 'No image provided'}), 400
+            return jsonify({'error': 'No image'}), 400
         
         image_file = request.files['image']
+        print(f"\n🖼️ Image: {image_file.filename}")
         
-        # معالجة الصورة
         img_array = preprocess_image(image_file)
         
-        # التنبؤ
         predictions = model.predict(img_array, verbose=0)
-        predicted_class_idx = np.argmax(predictions[0])
-        confidence = float(predictions[0][predicted_class_idx]) * 100
+        top_3_idx = np.argsort(predictions[0])[-3:][::-1]
         
-        # النتيجة
-        predicted_class = class_names[predicted_class_idx]
+        print("\n📊 Top 3:")
+        for i, idx in enumerate(top_3_idx, 1):
+            print(f"  {i}. {class_names[idx]}: {predictions[0][idx]*100:.2f}%")
+        
+        predicted_idx = top_3_idx[0]
+        confidence = float(predictions[0][predicted_idx]) * 100
         
         return jsonify({
             'success': True,
-            'predicted_class': predicted_class,
+            'predicted_class': class_names[predicted_idx],
             'confidence': f"{confidence:.1f}%"
         })
         
     except Exception as e:
+        print(f"❌ Error: {e}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     print("\n" + "="*50)
-    print("✅ SmartLeaf Server is Ready!")
-    print("🌐 Open: http://localhost:5000")
-    print("📝 Use POST /predict with 'image' file")
+    print("✅ SmartLeaf (Rescale) Ready!")
+    print("🌐 http://localhost:5000")
     print("="*50 + "\n")
     app.run(debug=True, port=5000, host='0.0.0.0')
