@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SmartLeaf - AI Plant Health Analysis</title>
+    <title>SmartLeaf - Plant Health Analysis</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="tracker"></div>
     <div id="particles"></div>
     
-    <!-- Header -->
     <header class="site-header">
         <div class="header-container">
             <div class="logo-section">
@@ -26,97 +25,69 @@
     </header>
 
     <div class="container">
-        <!-- Hero Section -->
         <section class="hero-section">
-            <h1 class="hero-title">Discover Your Plant's Health</h1>
-            <p class="hero-description">Advanced AI technology that identifies plant species and analyzes health conditions instantly. Simply upload a leaf photo and get comprehensive insights.</p>
+            <h1 class="hero-title">Analyze Your Plant's Health</h1>
+            <p class="hero-subtitle">Upload a photo and get instant AI-powered insights</p>
         </section>
 
-        <!-- Main Analysis Card -->
-        <div class="main-card">
-            <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">🌿</div>
-                <div class="upload-text">Drop your plant image here</div>
-                <div class="upload-hint">or click to browse</div>
-                <div class="supported-formats">JPG, PNG, WEBP • Max 10MB</div>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
+        <!-- منطقة رفع الصورة -->
+        <div id="uploadArea" class="upload-area">
+            <div class="upload-icon">🌿</div>
+            <p class="upload-text">Drop your plant image here</p>
+            <p class="upload-subtext">or click to browse</p>
+            <p class="upload-formats">Supports: JPG, PNG, WEBP</p>
+            <input type="file" id="fileInput" accept="image/*" hidden>
+        </div>
 
-            <div class="preview-container" id="previewContainer">
-                <div class="image-wrapper">
-                    <img id="imagePreview" class="image-preview" alt="Image Preview">
-                </div>
-                <button class="analyze-btn" id="analyzeBtn">
-                    <span class="btn-icon">🔍</span>
-                    <span>Analyze Now</span>
-                </button>
-            </div>
+        <!-- معاينة الصورة -->
+        <div id="previewContainer" class="preview-container">
+            <img id="imagePreview" class="image-preview" alt="Preview">
+            <button id="analyzeBtn" class="analyze-btn">
+                <span>🔍</span> Analyze Plant
+            </button>
+        </div>
 
-            <div class="loading" id="loading">
-                <div class="loader-wrapper">
-                    <div class="loader"></div>
-                </div>
-                <div class="loading-text">Analyzing your plant...</div>
-                <div class="loading-subtext">Our AI is examining the image</div>
-            </div>
+        <!-- شاشة التحميل -->
+        <div id="loading" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Analyzing your plant...</p>
+            <p class="loading-subtext">Our AI is examining the image</p>
+        </div>
 
-            <div class="results-container" id="resultsContainer">
-                <div class="results-header">
-                    <h2>Analysis Complete</h2>
-                    <div class="results-badge">✓ Success</div>
+        <!-- النتائج -->
+        <div id="resultsContainer" class="results-container">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>Analysis Results</h2>
+                    <span id="confidence" class="confidence-badge">0%</span>
                 </div>
                 
-                <div class="results-grid">
-                    <div class="result-card">
-                        <div class="result-icon">🌱</div>
-                        <div class="result-label">Plant Species</div>
-                        <div class="result-value" id="plantName">-</div>
+                <div class="result-info">
+                    <div class="info-item">
+                        <span class="info-label">Plant Name:</span>
+                        <span id="plantName" class="info-value">-</span>
                     </div>
-                    <div class="result-card">
-                        <div class="result-icon">💚</div>
-                        <div class="result-label">Health Status</div>
-                        <div class="result-value" id="healthStatus">-</div>
-                    </div>
-                    <div class="result-card">
-                        <div class="result-icon">📊</div>
-                        <div class="result-label">Confidence</div>
-                        <div class="result-value" id="confidence">-</div>
+                    <div class="info-item">
+                        <span class="info-label">Health Status:</span>
+                        <span id="healthStatus" class="info-value">-</span>
                     </div>
                 </div>
 
                 <div class="recommendations">
-                    <h3>💡 Care Tips</h3>
+                    <h3>Care Recommendations</h3>
                     <div class="recommendations-list">
-                        <!-- سيتم ملؤها ديناميكياً من JavaScript -->
+                        <!-- سيتم ملؤها بواسطة JavaScript -->
                     </div>
                 </div>
             </div>
-
-            <div class="actions-container">
-                <button class="reset-btn" id="resetBtn">
-                    <span>↻</span> Analyze Another Plant
-                </button>
-            </div>
         </div>
 
-        <!-- Quick Features -->
-        <section class="quick-features">
-            <div class="feature-badge">
-                <span class="badge-icon">⚡</span>
-                <span>Instant Results</span>
-            </div>
-            <div class="feature-badge">
-                <span class="badge-icon">🎯</span>
-                <span>AI-Powered</span>
-            </div>
-            <div class="feature-badge">
-                <span class="badge-icon">🔒</span>
-                <span>100% Private</span>
-            </div>
-        </section>
+        <!-- زر إعادة التحليل -->
+        <button id="resetBtn" class="reset-btn">
+            <span>🔄</span> Analyze Another Plant
+        </button>
     </div>
 
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-brand">
@@ -129,10 +100,6 @@
         </div>
     </footer>
 
-    <!-- TensorFlow.js Library - مهم جداً! -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
-    
-    <!-- Your Script -->
     <script src="script.js"></script>
 </body>
 </html>

@@ -3,20 +3,43 @@
 No conversion needed! Use your Keras model directly.
 """
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-from tensorflow import keras
-import numpy as np
-from PIL import Image
+from flask import Flask, request, jsonify # type: ignore
+from flask_cors import CORS # type: ignore
+from tensorflow import keras # type: ignore
+import numpy as np # type: ignore
+from PIL import Image # type: ignore
 import io
-import glob
+import os
 
 app = Flask(__name__)
 CORS(app)  # للسماح بالاتصال من المتصفح
 
 # تحميل المودل عند بداية التطبيق
 print("⏳ Loading model...")
-model_file = glob.glob('final*')[0]
+
+# البحث عن ملف المودل
+model_file = None
+possible_names = [
+    'final_model_transfer_learning.keras',
+    'final_model_transfer_learning.h5',
+    'final*.keras',
+    'final*.h5'
+]
+
+for name in possible_names:
+    if '*' in name:
+        import glob
+        files = glob.glob(name)
+        if files:
+            model_file = files[0]
+            break
+    elif os.path.exists(name):
+        model_file = name
+        break
+
+if not model_file:
+    raise FileNotFoundError("❌ Model file not found! Please add: final_model_transfer_learning.keras")
+
 model = keras.models.load_model(model_file)
 print(f"✅ Model loaded: {model_file}")
 print(f"📊 Classes: {model.output_shape[-1]}")
@@ -68,9 +91,25 @@ def preprocess_image(image_file):
 @app.route('/')
 def home():
     return """
-    <h1>🌿 SmartLeaf API is Running!</h1>
-    <p>Use POST /predict to analyze plant images</p>
-    """
+    <html>
+    <head>
+        <style>
+            body { font-family: Arial; text-align: center; padding: 50px; background: #f0f7f4; }
+            h1 { color: #457b67; }
+            .status { background: #8BC3AE; color: white; padding: 20px; border-radius: 10px; }
+        </style>
+    </head>
+    <body>
+        <h1>🌿 SmartLeaf API is Running!</h1>
+        <div class="status">
+            <p>✅ Server is Ready</p>
+            <p>📊 Model: {}</p>
+            <p>🔢 Classes: {}</p>
+            <p>📝 Use POST /predict to analyze plant images</p>
+        </div>
+    </body>
+    </html>
+    """.format(model_file, len(class_names))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -103,7 +142,9 @@ def predict():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    print("\n✅ Server is ready!")
+    print("\n" + "="*50)
+    print("✅ SmartLeaf Server is Ready!")
     print("🌐 Open: http://localhost:5000")
-    print("📝 Use POST /predict with 'image' file\n")
-    app.run(debug=True, port=5000)
+    print("📝 Use POST /predict with 'image' file")
+    print("="*50 + "\n")
+    app.run(debug=True, port=5000, host='0.0.0.0')
