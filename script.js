@@ -871,15 +871,12 @@ async function predictPlant(imageElement) {
     try {
         console.log('🔍 بدء إرسال الصورة للـ API...');
         
-        // تحويل الصورة إلى blob
         const response = await fetch(imageElement.src);
         const blob = await response.blob();
         
-        // إنشاء FormData وإضافة الصورة
         const formData = new FormData();
         formData.append('image', blob, 'plant.jpg');
         
-        // إرسال الصورة للـ API
         console.log('📤 إرسال الطلب إلى: http://localhost:5000/predict');
         const apiResponse = await fetch('http://localhost:5000/predict', {
             method: 'POST',
@@ -897,7 +894,6 @@ async function predictPlant(imageElement) {
             throw new Error(result.error || 'Unknown error from API');
         }
         
-        // الحصول على معلومات العناية من البيانات المحلية
         const predictedClass = result.predicted_class;
         const careInfo = plantCareData[predictedClass] || {
             plantName: predictedClass.split('_')[0].replace(/_/g, ' '),
@@ -916,7 +912,6 @@ async function predictPlant(imageElement) {
     } catch (error) {
         console.error('❌ خطأ في التنبؤ:', error);
         
-        // رسائل خطأ واضحة ومفيدة
         if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
             return {
                 plantName: 'Connection Error',
@@ -954,13 +949,23 @@ const loading = document.getElementById('loading');
 const resultsContainer = document.getElementById('resultsContainer');
 const resetBtn = document.getElementById('resetBtn');
 
+// ✅ إخفاء النتائج عند تحميل الصفحة
+window.addEventListener('DOMContentLoaded', () => {
+    if (resultsContainer) resultsContainer.classList.remove('active');
+    if (resetBtn) resetBtn.classList.remove('active');
+    if (previewContainer) previewContainer.classList.remove('active');
+    if (loading) loading.classList.remove('active');
+    if (uploadArea) {
+        uploadArea.style.display = 'block';
+        uploadArea.style.opacity = '1';
+    }
+});
+
 if (uploadArea && fileInput) {
-    // النقر على منطقة الرفع
     uploadArea.addEventListener('click', () => {
         fileInput.click();
     });
 
-    // السحب والإفلات
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.style.borderColor = '#457b67';
@@ -986,7 +991,6 @@ if (uploadArea && fileInput) {
         }
     });
 
-    // اختيار الملف
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -994,7 +998,6 @@ if (uploadArea && fileInput) {
         }
     });
 
-    // عرض الصورة
     function displayImage(file) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -1020,12 +1023,10 @@ if (uploadArea && fileInput) {
         reader.readAsDataURL(file);
     }
 
-    // زر التحليل
     if (analyzeBtn) {
         analyzeBtn.addEventListener('click', async () => {
             console.log('🚀 بدء التحليل...');
             
-            // إخفاء معاينة الصورة
             previewContainer.style.transition = 'all 0.4s ease';
             previewContainer.style.opacity = '0';
             previewContainer.style.transform = 'scale(0.95)';
@@ -1043,10 +1044,8 @@ if (uploadArea && fileInput) {
                 }, 50);
             }, 300);
 
-            // التنبؤ باستخدام API
             const results = await predictPlant(imagePreview);
             
-            // عرض النتائج
             setTimeout(() => {
                 loading.style.opacity = '0';
                 loading.style.transform = 'scale(0.95)';
@@ -1064,7 +1063,6 @@ if (uploadArea && fileInput) {
                         resultsContainer.style.transform = 'translateY(0)';
                     }, 50);
 
-                    // عرض النتائج بتأثير متتابع
                     setTimeout(() => {
                         document.getElementById('plantName').textContent = results.plantName;
                     }, 200);
@@ -1075,7 +1073,6 @@ if (uploadArea && fileInput) {
                         document.getElementById('confidence').textContent = results.confidence;
                     }, 600);
                     
-                    // عرض النصائح
                     setTimeout(() => {
                         const tipsList = document.querySelector('.recommendations-list');
                         tipsList.innerHTML = '';
@@ -1101,7 +1098,6 @@ if (uploadArea && fileInput) {
                         });
                     }, 800);
                     
-                    // كونفيتي للنباتات الصحية
                     if (results.healthStatus.toLowerCase().includes('healthy')) {
                         setTimeout(() => {
                             createConfetti();
@@ -1112,7 +1108,6 @@ if (uploadArea && fileInput) {
         });
     }
 
-    // زر إعادة التحليل
     if (resetBtn) {
         resetBtn.addEventListener('click', () => {
             console.log('🔄 إعادة تعيين...');
@@ -1143,7 +1138,6 @@ if (uploadArea && fileInput) {
     }
 }
 
-// ==================== تأثير الكونفيتي ====================
 function createConfetti() {
     const colors = ['#8BC3AE', '#a3b18a', '#457b67', '#91a68d'];
     const confettiCount = 50;
@@ -1178,6 +1172,5 @@ function createConfetti() {
     }
 }
 
-// رسالة في الـ Console
 console.log('%c🌿 SmartLeaf loaded!', 'color: #8BC3AE; font-size: 20px; font-weight: bold');
 console.log('%cMake sure Python API is running: python app.py', 'color: #457b67; font-size: 14px');
